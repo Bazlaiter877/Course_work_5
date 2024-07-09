@@ -48,10 +48,11 @@ class PostgresDBManager(DBManager):
     @property
     def get_all_vacancies(self) -> list[tuple[str, str, int, str]]:
         sql = """
-        SELECT e.name, v.title, v.salary_from, v.url
+        SELECT e.name, v.name, v.salary_from, v.url
         FROM vacancies as v
         JOIN employers as e ON v.employer_id = e.id
         """
+
         self.connect()
         with self.connection.cursor() as cursor:
             cursor.execute(sql)
@@ -64,7 +65,7 @@ class PostgresDBManager(DBManager):
     def get_vacancies_with_higher_salary(self) -> list[tuple[str, str, int, str]]:
         avg_salary = self.get_avg_salary()
         sql = """
-        SELECT e.name, v.title, v.salary_from, v.url
+        SELECT e.name, v.name, v.salary_from, v.url
         FROM vacancies as v
         JOIN employers as e ON v.employer_id = e.id
         WHERE v.salary_from > %s
@@ -78,14 +79,25 @@ class PostgresDBManager(DBManager):
 
     def get_vacancies_with_keyword(self, keyword: str) -> list[tuple[str, str, int, str]]:
         sql = """
-        SELECT e.name, v.title, v.salary_from, v.url
-        FROM vacancies as v
-        JOIN employers as e ON v.employer_id = e.id
-        WHERE v.title ILIKE %s
+        SELECT e.name AS "Название компании", v.name AS "Название вакансии", v.salary_from AS "Зарплата", v.url AS "Ссылка"
+        FROM vacancies v
+        JOIN employers e ON v.employer_id = e.id
+        WHERE v.name ILIKE %s
         """
-        self.connect()
-        with self.connection.cursor() as cursor:
-            cursor.execute(sql, (f"%{keyword}%",))
-            result = cursor.fetchall()
-        self.disconnect()
+        try:
+            self.connect()
+            with self.connection.cursor() as cursor:
+                cursor.execute(sql, (f"%{keyword}%",))
+                result = cursor.fetchall()
+        except Exception as e:
+            print(f"Error fetching vacancies: {e}")
+            result = []
+        finally:
+            self.disconnect()
+
         return result
+
+
+
+
+
