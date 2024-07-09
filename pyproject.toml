@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "course-work-5"
+version = "0.1.0"
+description = ""
+authors = ["anton <bazlaiter877@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+requests = "^2.32.3"
+prettytable = "^3.10.0"
+python-dotenv = "^1.0.1"
+psycopg2 = "^2.9.9"
+tqdm = "^4.66.4"
+
+
+[tool.poetry.scripts]
+search-employers = 'course_work_5.cli.search_employers:run'
+init = 'course_work_5.cli.init_db:run'
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^8.26.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
